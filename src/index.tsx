@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-pascal-case */
-import Portal from '@reach/portal'
 import React, { forwardRef, useRef, useState, useCallback } from 'react'
 import { BottomSheet as _BottomSheet } from './BottomSheet'
 import type { Props, RefHandles, SpringEvent } from './types'
@@ -74,15 +72,13 @@ export const BottomSheet = forwardRef<RefHandles, Props>(function BottomSheet(
   }
 
   return (
-    <Portal data-rsbs-portal>
-      <_BottomSheet
-        {...props}
-        lastSnapRef={lastSnapRef}
-        ref={ref}
-        initialState={initialStateRef.current}
-        onSpringStart={handleSpringStart}
-        onSpringEnd={handleSpringEnd}
-      />
-    </Portal>
+    <_BottomSheet
+      {...props}
+      lastSnapRef={lastSnapRef}
+      ref={ref}
+      initialState={initialStateRef.current}
+      onSpringStart={handleSpringStart}
+      onSpringEnd={handleSpringEnd}
+    />
   )
 })
