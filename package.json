@@ -29,7 +29,8 @@
     "lint": "eslint . --ext ts,tsx,js,jsx --max-warnings 0 && tsc",
     "prepublishOnly": "npm run build:dist",
     "start": "next start",
-    "test": "npm run prepublishOnly && npm run build"
+    "test": "npm run prepublishOnly && npm run build",
+    "tsc-lint": "tsc --noEmit --pretty"
   },
   "sideEffects": [
     "*.css"
@@ -41,8 +42,10 @@
     "@xstate/react": "^1.2.0",
     "body-scroll-lock": "^3.1.5",
     "focus-trap": "^6.2.2",
+    "immer": "^10.0.3",
     "react-spring": "^8.0.27",
     "react-use-gesture": "^8.0.1",
+    "use-immer-ref": "^1.0.5",
     "xstate": "^4.15.1"
   },
   "peerDependencies": {

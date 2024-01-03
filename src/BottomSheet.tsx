@@ -34,6 +34,7 @@ import type {
   SnapPointProps,
 } from './types'
 import { debugging } from './utils'
+import { useImmerRef } from 'use-immer-ref'
 
 const { tension, friction } = config.default
 
@@ -69,6 +70,7 @@ export const BottomSheet = React.forwardRef<
     onSpringEnd,
     reserveScrollBarGap = blocking,
     expandOnContentDrag = false,
+    onChangeTargetSnapHeight,
     ...props
   },
   forwardRef
@@ -101,7 +103,12 @@ export const BottomSheet = React.forwardRef<
   const overlayRef = useRef<HTMLDivElement | null>(null)
 
   // Keeps track of the current height, or the height transitioning to
-  const heightRef = useRef(0)
+  const [heightState, setHeight, heightRef] = useImmerRef(0)
+
+  useEffect(() => {
+    onChangeTargetSnapHeight(heightState)
+  }, [heightState])
+
   const resizeSourceRef = useRef<ResizeSource>()
   const preventScrollingRef = useRef(false)
 
@@ -113,6 +120,7 @@ export const BottomSheet = React.forwardRef<
     enabled: ready && scrollLocking,
     reserveScrollBarGap,
   })
+
   const ariaHiderRef = useAriaHider({
     targetRef: containerRef,
     enabled: ready && blocking,
@@ -312,7 +320,8 @@ export const BottomSheet = React.forwardRef<
         canDragRef.current = false
       }, [ariaHiderRef, focusTrapRef, scrollLockRef]),
       openImmediately: useCallback(async () => {
-        heightRef.current = defaultSnapRef.current
+        setHeight(defaultSnapRef.current)
+
         await asyncSet({
           y: defaultSnapRef.current,
           ready: 1,
@@ -334,7 +343,7 @@ export const BottomSheet = React.forwardRef<
           immediate: true,
         })
 
-        heightRef.current = defaultSnapRef.current
+        setHeight(defaultSnapRef.current)
 
         await asyncSet({
           y: defaultSnapRef.current,
@@ -349,7 +358,8 @@ export const BottomSheet = React.forwardRef<
       snapSmoothly: useCallback(
         async (context, event) => {
           const snap = findSnapRef.current(context.y)
-          heightRef.current = snap
+          setHeight(snap)
+
           lastSnapRef.current = snap
           await asyncSet({
             y: snap,
@@ -365,7 +375,8 @@ export const BottomSheet = React.forwardRef<
       ),
       resizeSmoothly: useCallback(async () => {
         const snap = findSnapRef.current(heightRef.current)
-        heightRef.current = snap
+        setHeight(snap)
+
         lastSnapRef.current = snap
         await asyncSet({
           y: snap,
@@ -387,7 +398,7 @@ export const BottomSheet = React.forwardRef<
             immediate: true,
           })
 
-          heightRef.current = 0
+          setHeight(0)
 
           await asyncSet({
             y: 0,
@@ -450,13 +461,13 @@ export const BottomSheet = React.forwardRef<
   useEffect(() => {
     const elem = scrollRef.current
 
-    const preventScrolling = e => {
+    const preventScrolling = (e) => {
       if (preventScrollingRef.current) {
         e.preventDefault()
       }
     }
 
-    const preventSafariOverscroll = e => {
+    const preventSafariOverscroll = (e) => {
       if (elem.scrollTop < 0) {
         requestAnimationFrame(() => {
           elem.style.overflow = 'hidden'
@@ -563,7 +574,7 @@ export const BottomSheet = React.forwardRef<
         newY = maxSnapRef.current
       }
 
-      preventScrollingRef.current = newY < maxSnapRef.current;
+      preventScrollingRef.current = newY < maxSnapRef.current
     } else {
       preventScrollingRef.current = false
     }
@@ -666,7 +677,12 @@ export const BottomSheet = React.forwardRef<
             {header}
           </div>
         )}
-        <div key="scroll" data-rsbs-scroll ref={scrollRef} {...(expandOnContentDrag ? bind({ isContentDragging: true }) : {})}>
+        <div
+          key="scroll"
+          data-rsbs-scroll
+          ref={scrollRef}
+          {...(expandOnContentDrag ? bind({ isContentDragging: true }) : {})}
+        >
           <div data-rsbs-content ref={contentRef}>
             {children}
           </div>
