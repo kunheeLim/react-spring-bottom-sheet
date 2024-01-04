@@ -34,7 +34,6 @@ import type {
   SnapPointProps,
 } from './types'
 import { debugging } from './utils'
-import { useImmerRef } from 'use-immer-ref'
 
 const { tension, friction } = config.default
 
@@ -103,11 +102,12 @@ export const BottomSheet = React.forwardRef<
   const overlayRef = useRef<HTMLDivElement | null>(null)
 
   // Keeps track of the current height, or the height transitioning to
-  const [heightState, setHeight, heightRef] = useImmerRef(0)
+  const heightRef = useRef(0);
 
-  useEffect(() => {
-    onChangeTargetSnapHeight(heightState)
-  }, [heightState])
+  const setHeightRef = (height: number) => {
+    heightRef.current = height;
+    onChangeTargetSnapHeight(height);
+  }
 
   const resizeSourceRef = useRef<ResizeSource>()
   const preventScrollingRef = useRef(false)
@@ -320,7 +320,7 @@ export const BottomSheet = React.forwardRef<
         canDragRef.current = false
       }, [ariaHiderRef, focusTrapRef, scrollLockRef]),
       openImmediately: useCallback(async () => {
-        setHeight(defaultSnapRef.current)
+        setHeightRef(defaultSnapRef.current)
 
         await asyncSet({
           y: defaultSnapRef.current,
@@ -343,7 +343,7 @@ export const BottomSheet = React.forwardRef<
           immediate: true,
         })
 
-        setHeight(defaultSnapRef.current)
+        setHeightRef(defaultSnapRef.current)
 
         await asyncSet({
           y: defaultSnapRef.current,
@@ -358,7 +358,7 @@ export const BottomSheet = React.forwardRef<
       snapSmoothly: useCallback(
         async (context, event) => {
           const snap = findSnapRef.current(context.y)
-          setHeight(snap)
+          setHeightRef(snap)
 
           lastSnapRef.current = snap
           await asyncSet({
@@ -375,7 +375,7 @@ export const BottomSheet = React.forwardRef<
       ),
       resizeSmoothly: useCallback(async () => {
         const snap = findSnapRef.current(heightRef.current)
-        setHeight(snap)
+        setHeightRef(snap)
 
         lastSnapRef.current = snap
         await asyncSet({
@@ -398,7 +398,7 @@ export const BottomSheet = React.forwardRef<
             immediate: true,
           })
 
-          setHeight(0)
+          setHeightRef(0)
 
           await asyncSet({
             y: 0,
