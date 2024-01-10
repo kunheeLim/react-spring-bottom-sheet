@@ -5,7 +5,7 @@
 @layer base {
   html,
   body {
-    @apply font-body overscroll-y-none;
+    /*@apply font-body overscroll-y-none;*/
   }
 }
 

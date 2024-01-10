@@ -102,11 +102,11 @@ export const BottomSheet = React.forwardRef<
   const overlayRef = useRef<HTMLDivElement | null>(null)
 
   // Keeps track of the current height, or the height transitioning to
-  const heightRef = useRef(0);
+  const heightRef = useRef(0)
 
   const setHeightRef = (height: number) => {
-    heightRef.current = height;
-    onChangeTargetSnapHeight(height);
+    heightRef.current = height
+    onChangeTargetSnapHeight?.(height)
   }
 
   const resizeSourceRef = useRef<ResizeSource>()
